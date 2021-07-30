@@ -33,7 +33,7 @@ def save_images(webpage, visuals, image_path, aspect_ratio=1.0, width=256):
 
     for label, im_data in visuals.items():
         im = util.tensor2im(im_data)
-        image_name = '%s/%s.png' % (label, name)
+        image_name = '%s/%s.npy' % (label, name)
         os.makedirs(os.path.join(image_dir, label), exist_ok=True)
         save_path = os.path.join(image_dir, image_name)
         util.save_image(im, save_path, aspect_ratio=aspect_ratio)
@@ -170,7 +170,7 @@ class Visualizer():
             # save images to the disk
             for label, image in visuals.items():
                 image_numpy = util.tensor2im(image)
-                img_path = os.path.join(self.img_dir, 'epoch%.3d_%s.png' % (epoch, label))
+                img_path = os.path.join(self.img_dir, 'epoch%.3d_%s.npy' % (epoch, label))
                 util.save_image(image_numpy, img_path)
 
             # update website
@@ -181,7 +181,7 @@ class Visualizer():
 
                 for label, image_numpy in visuals.items():
                     image_numpy = util.tensor2im(image)
-                    img_path = 'epoch%.3d_%s.png' % (n, label)
+                    img_path = 'epoch%.3d_%s.npy' % (n, label)
                     ims.append(img_path)
                     txts.append(label)
                     links.append(img_path)
