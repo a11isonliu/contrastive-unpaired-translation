@@ -4,6 +4,7 @@ from options.train_options import TrainOptions
 from data import create_dataset
 from models import create_model
 from util.visualizer import Visualizer
+import numpy as np
 
 
 if __name__ == '__main__':
