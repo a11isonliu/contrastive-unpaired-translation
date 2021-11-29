@@ -20,7 +20,6 @@ if __name__ == '__main__':
     total_iters = 0                # the total number of training iterations
 
     optimize_time = 0.1
-    print(np.shape(dataset))
     times = []
     for epoch in range(opt.epoch_count, opt.n_epochs + opt.n_epochs_decay + 1):    # outer loop for different epochs; we save the model by <epoch_count>, <epoch_count>+<save_latest_freq>
         epoch_start_time = time.time()  # timer for entire epoch
@@ -42,8 +41,7 @@ if __name__ == '__main__':
                 torch.cuda.synchronize()
             optimize_start_time = time.time()
             if epoch == opt.epoch_count and i == 0:
-                print(np.shape(data))
-                model.data_dependent_initialize(data)
+                # model.data_dependent_initialize(data)
                 model.setup(opt)               # regular setup: load and print networks; create schedulers
                 model.parallelize()
             model.set_input(data)  # unpack data from dataset and apply preprocessing
