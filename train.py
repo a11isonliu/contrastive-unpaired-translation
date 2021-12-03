@@ -60,7 +60,7 @@ if __name__ == '__main__':
                 torch.cuda.synchronize()
             optimize_start_time = time.time()
             if epoch == opt.epoch_count and i == 0:
-                model.data_dependent_initialize(data)  # Allison: This function was not working for pix2pix and cycle_gan
+                model.data_dependent_initialize(data)  # Allison: This function was not needed for pix2pix and cycle_gan, was throwing errors so I commented it out before running
                 model.setup(opt)               # regular setup: load and print networks; create schedulers
                 model.parallelize()
             model.set_input(data)  # unpack data from dataset and apply preprocessing
