@@ -88,18 +88,18 @@ def save_image(image_numpy, image_path, aspect_ratio=1.0):
         image_numpy (numpy array) -- input numpy array
         image_path (str)          -- the path of the image
     """
-    np.save(image_path, image_numpy)
+    # np.save(image_path, image_numpy) # Allison: Save as .npy
             
-    # image_pil = Image.fromarray(image_numpy)
-    # h, w, _ = image_numpy.shape
+    image_pil = Image.fromarray(image_numpy)
+    h, w, _ = image_numpy.shape
 
-    # if aspect_ratio is None:
-    #     pass
-    # elif aspect_ratio > 1.0:
-    #     image_pil = image_pil.resize((h, int(w * aspect_ratio)), Image.BICUBIC)
-    # elif aspect_ratio < 1.0:
-    #     image_pil = image_pil.resize((int(h / aspect_ratio), w), Image.BICUBIC)
-    # image_pil.save(image_path)
+    if aspect_ratio is None:
+        pass
+    elif aspect_ratio > 1.0:
+        image_pil = image_pil.resize((h, int(w * aspect_ratio)), Image.BICUBIC)
+    elif aspect_ratio < 1.0:
+        image_pil = image_pil.resize((int(h / aspect_ratio), w), Image.BICUBIC)
+    image_pil.save(image_path)
 
 
 def print_numpy(x, val=True, shp=False):
