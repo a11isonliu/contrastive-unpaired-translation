@@ -193,7 +193,7 @@ class CycleGANModel(BaseModel):
         except:
             self.opt.amp = 0
 
-    def data_dependent_initialize(self):
+    def data_dependent_initialize(self, data):
         return
 
     def generate_visuals_for_evaluation(self, data, mode):
