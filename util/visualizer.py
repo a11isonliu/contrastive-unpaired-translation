@@ -171,7 +171,8 @@ class Visualizer():
             # save images to the disk
             for label, image in visuals.items():
                 image_numpy = util.tensor2im(image)
-                img_path = os.path.join(self.img_dir, 'epoch%.3d_%s.npy' % (epoch, label))
+                # img_path = os.path.join(self.img_dir, 'epoch%.3d_%s.npy' % (epoch, label))
+                img_path = os.path.join(self.img_dir, 'epoch%.3d_%s.jpg' % (epoch, label))
                 util.save_image(image_numpy, img_path)
 
             # update website
@@ -182,7 +183,8 @@ class Visualizer():
 
                 for label, image_numpy in visuals.items():
                     image_numpy = util.tensor2im(image)
-                    img_path = 'epoch%.3d_%s.npy' % (n, label)
+                    # img_path = 'epoch%.3d_%s.npy' % (n, label)
+                    img_path = 'epoch%.3d_%s.jpg' % (n, label)
                     ims.append(img_path)
                     txts.append(label)
                     links.append(img_path)
