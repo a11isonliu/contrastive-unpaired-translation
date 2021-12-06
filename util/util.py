@@ -92,7 +92,7 @@ def save_image(image_numpy, image_path, aspect_ratio=1.0):
             
     image_pil = Image.fromarray(image_numpy)
     h, w, _ = image_numpy.shape
-
+    print(f'IMAGE PATH: {image_path}')
     if aspect_ratio is None:
         pass
     elif aspect_ratio > 1.0:
