@@ -22,7 +22,7 @@ def free_gpu_cache():
     print("GPU Usage after emptying the cache")
     gpu_usage()
 
-free_gpu_cache()                           
+# free_gpu_cache()                           
 
 
 
