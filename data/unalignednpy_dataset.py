@@ -59,6 +59,7 @@ class UnalignedNpyDataset(BaseDataset):
         #load npy array
         A_arr = np.load(A_path)
         B_arr = np.load(B_path)
+        print(np.nanmax(A_arr))
         A = torch.from_numpy(A_arr)
         B = torch.from_numpy(B_arr)
         # A_img = Image.fromarray(A_arr, mode='F') #open npy array
