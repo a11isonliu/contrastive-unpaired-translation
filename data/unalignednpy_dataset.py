@@ -55,26 +55,18 @@ class UnalignedNpyDataset(BaseDataset):
         else:   # randomize the index for domain B to avoid fixed pairs.
             index_B = random.randint(0, self.B_size - 1)
         B_path = self.B_paths[index_B]
-        # numpy array instead of jpeg
+
         #load npy array
         A_arr = np.load(A_path)
         B_arr = np.load(B_path)
-        # print("NANMAX A_arr: ", np.nanmax(A_arr))
-        # print("NANMIN A_arr: ", np.nanmin(A_arr))
 
-        A_img = Image.fromarray(A_arr, mode='F') #open npy array
-        B_img = Image.fromarray(B_arr, mode='F') #open npy array
-        # print("NANMAX A_img: ", np.nanmax(A_img))
-        # print("NANMIN A_img: ", np.nanmin(A_img))
+        A_img = Image.fromarray(A_arr) #open npy array
+        B_img = Image.fromarray(B_arr) #open npy array
     
-        # A_img = Image.open(A_path).convert('RGB')
-        # B_img = Image.open(B_path).convert('RGB')
         # apply image transformation
         A = self.transform_A(A_img)
         B = self.transform_B(B_img)
-        # print("TYPE A: ", type(A))
-        # print("NANMAX A: ", np.nanmax(A))
-        # print("NANMIN A: ", np.nanmin(A))
+        
         return {'A': A, 'B': B, 'A_paths': A_path, 'B_paths': B_path}
 
     def __len__(self):

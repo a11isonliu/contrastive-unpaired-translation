@@ -48,16 +48,24 @@ def tensor2im(input_image, imtype=np.float64):
         input_image (tensor) --  the input image tensor array
         imtype (type)        --  the desired type of the converted numpy array
     """
+    print('In util/tensor2im.')
     if not isinstance(input_image, np.ndarray):
+        print('not ndarray.')
         if isinstance(input_image, torch.Tensor):  # get the data from a variable
+            print('is a tensor')
             image_tensor = input_image.data
         else:
+            print('not a tensor, returning. Image shape: ', np.shape(input_image))
             return input_image
+        print('converting to numpy array.')
         image_numpy = image_tensor[0].clamp(-1.0, 1.0).cpu().float().numpy()  # convert it into a numpy array
+        print('new numpy array shape: ', np.shape(image_numpy))
         if image_numpy.shape[0] == 1:  # grayscale to RGB
             image_numpy = np.tile(image_numpy, (3, 1, 1))
         image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2.0 * 255.0  # post-processing: tranpose and scaling
+        print('converted to nparray. shape: ', np.shape(image_numpy))
     else:  # if it is a numpy array, do nothing
+        print('image is a numpy array already. shape: ', np.shape(image_numpy))
         image_numpy = input_image
     return image_numpy.astype(imtype)
 

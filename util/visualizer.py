@@ -33,6 +33,7 @@ def save_images(webpage, visuals, image_path, aspect_ratio=1.0, width=256):
 
     for label, im_data in visuals.items():
         im = util.tensor2im(im_data)
+        print('In visualizer.py, save images. Image dimensions: ', np.shape(im))
         # image_name = '%s/%s.jpg' % (label, name)
         image_name = '%s/%s.npy' % (label, name)
         os.makedirs(os.path.join(image_dir, label), exist_ok=True)
