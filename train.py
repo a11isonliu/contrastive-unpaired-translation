@@ -13,6 +13,7 @@ if __name__ == '__main__':
     opt = TrainOptions().parse()   # get training options
     dataset = create_dataset(opt)  # create a dataset given opt.dataset_mode and other options
     dataset_size = len(dataset)    # get the number of images in the dataset.
+    
 
     model = create_model(opt)      # create a model given opt.model and other options
     print('The number of training images = %d' % dataset_size)
@@ -32,6 +33,9 @@ if __name__ == '__main__':
         dataset.set_epoch(epoch)
         
         for i, data in enumerate(dataset):  # inner loop within one epoch
+            if i==0:
+                print('data: ', np.shape(data))
+                print(data)
             iter_start_time = time.time()  # timer for computation per iteration
             if total_iters % opt.print_freq == 0:
                 t_data = iter_start_time - iter_data_time
@@ -44,8 +48,6 @@ if __name__ == '__main__':
             optimize_start_time = time.time()
             if epoch == opt.epoch_count and i == 0:
                 model.data_dependent_initialize(data)  # Allison: This function was not needed for pix2pix and cycle_gan, was throwing errors so I commented it out before running
-                if i < 5:
-                    print('In train.py. data shape: ', i, np.shape(data))
                 model.setup(opt)               # regular setup: load and print networks; create schedulers
                 model.parallelize()
             model.set_input(data)  # unpack data from dataset and apply preprocessing
@@ -57,6 +59,7 @@ if __name__ == '__main__':
             if total_iters % opt.display_freq == 0:   # display images on visdom and save images to a HTML file
                 save_result = total_iters % opt.update_html_freq == 0
                 model.compute_visuals()
+                print('visualizer.display_current_results')
                 visualizer.display_current_results(model.get_current_visuals(), epoch, save_result)
 
             if total_iters % opt.print_freq == 0:    # print training losses and save logging information to the disk

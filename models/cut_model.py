@@ -102,6 +102,9 @@ class CUTModel(BaseModel):
         bs_per_gpu = self.real_A.size(0) // max(len(self.opt.gpu_ids), 1)
         self.real_A = self.real_A[:bs_per_gpu]
         self.real_B = self.real_B[:bs_per_gpu]
+        print('data_dependent_initialize. real_A, real_B')
+        print(type(self.real_A), self.real_A.size(), torch.max(self.real_A), torch.min(self.real_A))
+        print(type(self.real_B), self.real_B.size(), torch.max(self.real_B), torch.min(self.real_B))
         self.forward()                     # compute fake images: G(A)
         if self.opt.isTrain:
             self.compute_D_loss().backward()                  # calculate gradients for D
@@ -143,16 +146,29 @@ class CUTModel(BaseModel):
         self.real_B = input['B' if AtoB else 'A'].to(self.device)
         self.image_paths = input['A_paths' if AtoB else 'B_paths']
 
+        print('set_input. real_A, real_B')
+        print(type(self.real_A), self.real_A.size(), torch.max(self.real_A), torch.min(self.real_A))
+        print(type(self.real_B), self.real_B.size(), torch.max(self.real_B), torch.min(self.real_B))
+    
     def forward(self):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""
         self.real = torch.cat((self.real_A, self.real_B), dim=0) if self.opt.nce_idt and self.opt.isTrain else self.real_A
+        
+        print('forward. self.real')
+        print(self.real.size, torch.max(self.real), torch.min(self.real))
+
+
         if self.opt.flip_equivariance:
             self.flipped_for_equivariance = self.opt.isTrain and (np.random.random() < 0.5)
             if self.flipped_for_equivariance:
                 self.real = torch.flip(self.real, [3])
 
         self.fake = self.netG(self.real)
+        print('fake', self.fake.size(), torch.max(self.fake), torch.min(self.fake))
         self.fake_B = self.fake[:self.real_A.size(0)]
+        
+        print('fake_B', self.fake_B.size(), torch.max(self.fake_B), torch.min(self.fake_B))
+
         if self.opt.nce_idt:
             self.idt_B = self.fake[self.real_A.size(0):]
 
