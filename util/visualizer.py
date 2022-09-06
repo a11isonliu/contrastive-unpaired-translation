@@ -26,14 +26,14 @@ def save_images(webpage, visuals, image_path, aspect_ratio=1.0, width=256):
     """
     image_dir = webpage.get_image_dir()
     short_path = ntpath.basename(image_path[0])
-    name = os.path.splitext(short_path)[0]
+    # name = os.path.splitext(short_path)[0]
+    name = str(short_path).split('.')[2].strip('_TAI')
 
     webpage.add_header(name)
     ims, txts, links = [], [], []
 
     for label, im_data in visuals.items():
-        im = util.tensor2im(im_data)
-        print('In visualizer.py, save images. Image dimensions: ', np.shape(im))
+        im = util.tensor2im(im_data) # converts Tensor array into numpy array
         # image_name = '%s/%s.jpg' % (label, name)
         image_name = '%s/%s.npy' % (label, name)
         os.makedirs(os.path.join(image_dir, label), exist_ok=True)

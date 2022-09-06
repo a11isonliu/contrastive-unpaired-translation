@@ -33,7 +33,8 @@ from models import create_model
 from util.visualizer import save_images
 from util import html
 import util.util as util
-
+from evaluation.evaluation import eval_summary
+import evaluation.pytorch_fid.fid_score as fid_score
 
 if __name__ == '__main__':
     opt = TestOptions().parse()  # get test options
@@ -50,10 +51,10 @@ if __name__ == '__main__':
     web_dir = os.path.join(opt.results_dir, opt.name, '{}_{}'.format(opt.phase, opt.epoch))  # define the website directory
     print('creating web directory', web_dir)
     webpage = html.HTML(web_dir, 'Experiment = %s, Phase = %s, Epoch = %s' % (opt.name, opt.phase, opt.epoch))
-
+    
     for i, data in enumerate(dataset):
         if i == 0:
-            # model.data_dependent_initialize(data)
+            model.data_dependent_initialize(data)
             model.setup(opt)               # regular setup: load and print networks; create schedulers
             model.parallelize()
             if opt.eval:
@@ -68,3 +69,18 @@ if __name__ == '__main__':
             print('processing (%04d)-th image... %s' % (i, img_path))
         save_images(webpage, visuals, img_path, width=opt.display_winsize)
     webpage.save()  # save the HTML
+
+    # evaluation
+    results_path = './results' + os.sep + opt.name + os.sep + 'test_latest/images' + os.sep
+    mdi_results_path = results_path + 'real_A'
+    hmi_results_path = results_path + 'real_B'
+    syn_results_path = results_path + 'fake_B'
+    hmi_syn_error, hmi_mdi_error = eval_summary(results_path, n_images=50, verbose=True)
+    fid_hmi_syn = fid_score.calculate_fid_given_paths([hmi_results_path, syn_results_path], batch_size=50, device=None, dims=2048, num_workers=1)
+    fid_hmi_mdi = fid_score.calculate_fid_given_paths([hmi_results_path, mdi_results_path], batch_size=50, device=None, dims=2048, num_workers=1)
+    fid_syn_mdi = fid_score.calculate_fid_given_paths([syn_results_path, mdi_results_path], batch_size=50, device=None, dims=2048, num_workers=1)
+    
+    # print results
+    print(f'fid_hmi_syn: {fid_hmi_syn}')
+    print(f'fid_hmi_mdi: {fid_hmi_mdi}')
+    print(f'fid_syn_mdi: {fid_syn_mdi}')

@@ -48,24 +48,17 @@ def tensor2im(input_image, imtype=np.float64):
         input_image (tensor) --  the input image tensor array
         imtype (type)        --  the desired type of the converted numpy array
     """
-    print('In util/tensor2im.')
     if not isinstance(input_image, np.ndarray):
-        print('not ndarray.')
         if isinstance(input_image, torch.Tensor):  # get the data from a variable
-            print('is a tensor')
             image_tensor = input_image.data
         else:
-            print('not a tensor, returning. Image shape: ', np.shape(input_image))
             return input_image
-        print('converting to numpy array.')
         image_numpy = image_tensor[0].clamp(-1.0, 1.0).cpu().float().numpy()  # convert it into a numpy array
-        print('new numpy array shape: ', np.shape(image_numpy))
         if image_numpy.shape[0] == 1:  # grayscale to RGB
             image_numpy = np.tile(image_numpy, (3, 1, 1))
-        image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2.0 * 255.0  # post-processing: tranpose and scaling
-        print('converted to nparray. shape: ', np.shape(image_numpy))
+        # image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2.0 * 255.0  # post-processing: tranpose and scaling
+        image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2.0 * 10000.0 - 5000.0  # post-processing: tranpose and scaling
     else:  # if it is a numpy array, do nothing
-        print('image is a numpy array already. shape: ', np.shape(image_numpy))
         image_numpy = input_image
     return image_numpy.astype(imtype)
 
@@ -96,7 +89,8 @@ def save_image(image_numpy, image_path, aspect_ratio=1.0):
         image_numpy (numpy array) -- input numpy array
         image_path (str)          -- the path of the image
     """
-    np.save(image_path, image_numpy) # Allison: Save as .npy
+    # print(np.shape(image_numpy[:,:,0]), np.max(image_numpy[:,:,0]), np.min(image_numpy[:,:,0]))
+    np.save(image_path, image_numpy[:,:,0]) # Allison: Save as .npy
             
     # image_pil = Image.fromarray(image_numpy)
     # h, w, _ = image_numpy.shape
