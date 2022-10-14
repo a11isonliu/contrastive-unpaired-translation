@@ -53,11 +53,19 @@ def tensor2im(input_image, imtype=np.float64):
             image_tensor = input_image.data
         else:
             return input_image
-        image_numpy = image_tensor[0].clamp(-1.0, 1.0).cpu().float().numpy()  # convert it into a numpy array
+        # image_numpy = image_tensor[0].clamp(-1.0, 1.0).cpu().float().numpy()
+        # image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2.0 * 255.0  # post-processing: tranpose and scaling
+        if np.isclose(torch.mean(image_tensor[0]).item(), 0.5, rtol=1e-02, atol=1e-04):
+            image_numpy = image_tensor[0].clamp(0, 1.0).cpu().float().numpy() # convert tensor to np array
+            image_numpy = (np.transpose(image_numpy, (1, 2, 0)) - 0.5) * 6000.0 * 2  # post-processing: tranpose and scaling. Scale between -6000 and 6000
+        else:
+            image_numpy = image_tensor[0].clamp(-1.0, 1.0).cpu().float().numpy()  # convert tensor to np array
+            image_numpy = np.transpose(image_numpy, (1, 2, 0)) * 6000.0  # post-processing: tranpose and scaling. Scale between -6000 and 6000
         if image_numpy.shape[0] == 1:  # grayscale to RGB
             image_numpy = np.tile(image_numpy, (3, 1, 1))
-        # image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2.0 * 255.0  # post-processing: tranpose and scaling
-        image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2.0 * 10000.0 - 5000.0  # post-processing: tranpose and scaling
+        # print('tensor2im transpose and scaling')
+        # print(np.shape(image_numpy), np.shape(image_numpy[:,:,0]), np.max(image_numpy[:,:,0]), np.min(image_numpy[:,:,0]), np.mean(image_numpy[:,:,0]))
+
     else:  # if it is a numpy array, do nothing
         image_numpy = input_image
     return image_numpy.astype(imtype)

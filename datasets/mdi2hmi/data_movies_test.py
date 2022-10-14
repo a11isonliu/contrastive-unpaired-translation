@@ -17,9 +17,13 @@ import pandas as pd
 import matplotlib
 #Makes MPEG movies of AIA hdf5 files in a specified directory. 
 
-dataset = 'trainB'
-DATADIR = '/media/faraday/magnetograms_fd/hmi_fd'
-FILELIST = './mdi2hmi_small/'+dataset+'.csv'
+mdi_dataset = 'testA'
+MDI_DATADIR = '/media/faraday/magnetograms_fd/mdi_fd'
+MDI_FILELIST = './mdi2hmi_small/'+mdi_dataset+'.csv'
+
+hmi_dataset = 'testB'
+HMI_DATADIR = '/media/faraday/magnetograms_fd/hmi_fd'
+HMI_FILELIST = './mdi2hmi_small/'+hmi_dataset+'.csv'
 
 # Keyword arguments:
 #   filerange  = list:, first, last, and delta filenumbers to use in compiling movie. Eg. RANGE=[1,1002,2] uses every other
@@ -28,11 +32,17 @@ FILELIST = './mdi2hmi_small/'+dataset+'.csv'
 
 def main():
     remove_png = True
-    file_names = pd.read_csv(FILELIST, header=None)
-    files = (DATADIR + os.sep + file_names[0].astype(str)).tolist()
-    files.sort()
-    nfiles = files.__len__()
-    print('{} files in directory {}'.format(nfiles, DATADIR))
+    mdi_file_names = pd.read_csv(MDI_FILELIST, header=None)
+    mdi_files = (MDI_DATADIR + os.sep + mdi_file_names[0].astype(str)).tolist()
+    mdi_files.sort()
+    nfiles = mdi_files.__len__()
+    print('{} files in MDI directory {}'.format(nfiles, MDI_DATADIR))
+    
+    hmi_file_names = pd.read_csv(HMI_FILELIST, header=None)
+    hmi_files = (HMI_DATADIR + os.sep + hmi_file_names[0].astype(str)).tolist()
+    hmi_files.sort()
+    nfiles = hmi_files.__len__()
+    print('{} files in HMI directory {}'.format(nfiles, HMI_DATADIR))
     
     colormap = plt.get_cmap('hmimag')
     
@@ -44,15 +54,21 @@ def main():
     
     matplotlib.rcParams.update({'font.size': 6})
 
-    fileroot = f'./mdi2hmi_small/movies/{dataset}' # SAVE PATH
+    fileroot = f'./mdi2hmi_small/movies/testAB' # SAVE PATH
     for i in range(r0,r1,delta):
-        mag_data = np.load(files[i])
-        file_time = datetime.strptime(str(files[i]).split('/')[-1].split('.')[2].strip('_TAI'),'%Y%m%d_%H%M%S')
+        mdi_data = np.load(mdi_files[i])
+        mdi_file_time = datetime.strptime(str(mdi_files[i]).split('/')[-1].split('.')[2].strip('_TAI'),'%Y%m%d_%H%M%S')
+        hmi_data = np.load(hmi_files[i])
+        hmi_file_time = datetime.strptime(str(hmi_files[i]).split('/')[-1].split('.')[2].strip('_TAI'),'%Y%m%d_%H%M%S')
         try:
-            plt.subplot()
+            plt.subplot(1, 2, 1)
             # CHANGE PLOT TITLE
-            plt.title(f'{dataset} - '+file_time.strftime('%Y/%m/%d %H:%M:%S'), fontsize = 9)
-            plt.imshow(mag_data, cmap = colormap, vmin = -5000, vmax = 5000)
+            plt.title('testA - '+mdi_file_time.strftime('%Y/%m/%d %H:%M:%S'), fontsize = 9)
+            plt.imshow(mdi_data, cmap = colormap, vmin = -5000, vmax = 5000)
+            plt.subplot(1, 2, 2)
+            # CHANGE PLOT TITLE
+            plt.title('testB - '+hmi_file_time.strftime('%Y/%m/%d %H:%M:%S'), fontsize = 9)
+            plt.imshow(hmi_data, cmap = colormap, vmin = -5000, vmax = 5000)
             # plt.xlim((0, 1024))
             # plt.ylim((0, 1024))
             plt.show()
@@ -66,7 +82,7 @@ def main():
     (
         ffmpeg
         .input(fileroot+'.*.png', pattern_type='glob', framerate=20) 
-        .output(fileroot + 'mdi2hmi_small_' + dataset + '.mov')
+        .output(fileroot + 'mdi2hmi_small_' + 'testAB' + '.mov')
         .run()
     )
 

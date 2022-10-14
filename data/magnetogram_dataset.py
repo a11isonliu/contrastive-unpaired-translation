@@ -41,9 +41,9 @@ class MagnetogramDataset(BaseDataset):
         """
         parser.add_argument('--file_savepath', type=str, default='placeholder', help='path to directory where files are saved')
         if is_train:
-            parser.set_defaults(file_savepath='/media/faraday/magnetograms_fd', dataroot='./datasets/mdi2hmi/mdi2hmi_small', load_size = 4096, crop_size = 360, batch_size = 8, preprocess = 'resize_and_crop', model = 'cut')  # specify dataset-specific default values
+            parser.set_defaults(file_savepath='/media/faraday/magnetograms_fd', dataroot='./datasets/mdi2hmi/mdi2hmi_small', load_size = 4096, crop_size = 360, batch_size = 8, preprocess = 'resize_and_crop', model = 'cut', display_freq=100, max_dataset_size=1000, n_epochs=10, n_epochs_decay=10)  # specify dataset-specific default values
         else:
-            parser.set_defaults(file_savepath='/media/faraday/magnetograms_fd', dataroot='./datasets/mdi2hmi/mdi2hmi_small', preprocess = 'resize', load_size = 2048, batch_size = 4, model = 'cut')
+            parser.set_defaults(file_savepath='/media/faraday/magnetograms_fd', dataroot='./datasets/mdi2hmi/mdi2hmi_small', preprocess = 'resize', load_size = 2048, batch_size = 4, model = 'cut', num_test=402)
         return parser
 
     def __init__(self, opt):
@@ -92,8 +92,7 @@ class MagnetogramDataset(BaseDataset):
             index_B = random.randint(0, self.B_size - 1)
         B_path = self.B_paths[index_B]
         #load npy array
-        A_arr0 = np.load(A_path)
-        A_arr = resize(A_arr0, (4096, 4096), order=3)
+        A_arr = np.load(A_path)
         B_arr = np.load(B_path)
         
         # remove nans
@@ -103,18 +102,18 @@ class MagnetogramDataset(BaseDataset):
         # Normalize images to between 0-1 using standard min-max normalization
 
         A_img = np.nan_to_num(A_arr).astype('float32')
+        A_img = resize(A_img, (4096, 4096), order=3)
         A_img[np.where(A_img > 6000)] = 6000
         A_img[np.where(A_img < -6000)] = -6000
         A_img = (A_img + 6000) / 12000
         A_img = torch.from_numpy(A_img).unsqueeze(0) # convert from np.array to tensor
  
         B_img = np.nan_to_num(B_arr).astype('float32')
-        B_img[np.where(B_img > 5000)] = 5000
-        B_img[np.where(B_img < -5000)] = -5000
-        B_img = (B_img + 5000) / 10000
+        B_img[np.where(B_img > 6000)] = 6000
+        B_img[np.where(B_img < -6000)] = -6000
+        B_img = (B_img + 6000) / 12000
         B_img = torch.from_numpy(B_img).unsqueeze(0) # convert from np.array to tensor
-       
-
+        
         # define the default transform function. You can use <base_dataset.get_transform>; You can also define your custom transform function
         transform = get_magnetogram_transform(self.opt, convert=False)
         A = transform(A_img)    # A_img must be a tensor or PIL Image
